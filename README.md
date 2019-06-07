@@ -28,3 +28,4 @@ NYC Taxi Rides: https://www1.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_tr
 
 ## Tech Stack
 
+<img align="left" src="information/DataPipelineTech.png"/>
