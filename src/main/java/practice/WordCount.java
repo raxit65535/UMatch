@@ -22,11 +22,10 @@ import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
-import org.apache.kafka.streams.kstream.KeyValueMapper;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Produced;
-import org.apache.kafka.streams.kstream.ValueMapper;
 import org.apache.kafka.streams.state.KeyValueStore;
+
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -40,6 +39,7 @@ import java.util.concurrent.CountDownLatch;
  * into a topic "streams-wordcount-output" where each record is an updated count of a single word.
  */
 public class WordCount {
+    
 
     public static void main(String[] args) throws Exception {
         Properties props = new Properties();
@@ -58,6 +58,7 @@ public class WordCount {
                .to("streams-wordcount-output", Produced.with(Serdes.String(), Serdes.Long()));
 
         final Topology topology = builder.build();
+        System.out.println(topology.describe());
         final KafkaStreams streams = new KafkaStreams(topology, props);
         final CountDownLatch latch = new CountDownLatch(1);
 

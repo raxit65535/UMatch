@@ -45,7 +45,7 @@ public class LineSplit {
         final StreamsBuilder builder = new StreamsBuilder();
 
         builder.stream("streams-plaintext-input")
-               .flatMapValues(value -> Arrays.asList(value.split("\\W+")))
+               .flatMapValues(value -> Arrays.asList(value.toString().split("\\W+")))
                .to("streams-linesplit-output");
 
         final Topology topology = builder.build();
