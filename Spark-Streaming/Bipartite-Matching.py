@@ -118,9 +118,15 @@ def process_union(rdd):
         if key not in total_driver:
             unmatched_driver_list.append(key)
     
+
+    # print("total number of ride request in a window: ", len(total_ride_req))
+    # print("Ride requests matched with driver in a window: ", len(matched_list))
+    # print("total number of driver active in the window: ", len(total_driver))
+    # print("number of drivers matched with rider in the window: ", len(matched_driver))
     
-    print(len(total_ride_req), len(matched_list))
-    print(len(total_driver), len(matched_driver))
+    # print(len(total_ride_req), len(matched_list))
+    # print(len(total_driver), len(matched_driver))
+    # print(len(sink_match), len(sink_driver))
 
 def main():
 
@@ -140,8 +146,8 @@ def main():
 
     # driver_rdd.pprint()
 
-    driver_window = spark_kafka_driver_Stream.window(10)
-    rider_window = spark_kafka_rider_stream.window(20)
+    driver_window = spark_kafka_driver_Stream.window(1)
+    rider_window = spark_kafka_rider_stream.window(2)
 
     # driver_window = spark_kafka_driver_Stream.withWatermark("water_mark", "2 hours")
     # rider_window = spark_kafka_rider_stream.withWatermark("water_mark","20 seconds")
