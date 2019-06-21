@@ -66,12 +66,14 @@ def main():
                 print(formatted_message)
                 producer.send('rider_topic', formatted_message.encode('utf8 '))
 
-                for int_point in intermediate_points:
-                    # print(int_point)
-                    ride_request_id = 'ride:' + str(datetime.now()) + ":" + str(random.randint(1, 10000))
-                    formatted_message = format_message(ride_request_id,int_point, drop_off_loc, str(datetime.now()))
+                # for int_point in intermediate_points:
+                #     # print(int_point)
+                #     ride_request_id_verbose = 'ride:' + str(datetime.now()) + ":" + str(random.randint(1, 10000))
 
-                    producer.send('rider_topic', formatted_message.encode('utf8 '))                
+                #     ride_request_id = re.sub('[\W\_]','',ride_request_id_verbose)
+                #     formatted_message = format_message(ride_request_id,int_point, drop_off_loc, str(datetime.now()))
+
+                #     producer.send('rider_topic', formatted_message.encode('utf8 '))                
 
 if __name__ == '__main__':
         main()

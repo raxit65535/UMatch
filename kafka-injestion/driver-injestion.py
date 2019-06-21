@@ -47,7 +47,7 @@ def main():
             if line_split[5] == '0' or line_split[6] == '0' or line_split[7] == '0' or line_split[8] == '0':
                 continue
             else:
-                driver_loc = (float(line_split[5]), float(line_split[6]))
+                driver_loc = (float(line_split[7]), float(line_split[8]))
                 # print("driver",driver_loc)
                 # rider_loc = (float(line_split[7]), float(line_split[8]))
                 # print("rider",rider_loc)

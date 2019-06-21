@@ -25,22 +25,23 @@ def main():
         .option("kafka.bootstrap.servers", "[localhost:9092]") \
         .option("subscribe", "driver-topic") \
         .load()
-    df_driver.selectExpr("CAST(key AS STRING)","CAST(value AS STRING)")
+    df_driver.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
 
     # consoleoutput = df_driver.writeStream.outputMode("append").format("console").start()
 
-    struct_driver =StructType([
-    StructField("driver_id", StringType(), True),
-    StructField("driver_loc", StringType(), True),
-    StructField("water_mark_driver", TimestampType(), True)])
+    struct_driver = StructType([
+        StructField("driver_id", StringType(), True),
+        StructField("driver_loc", StringType(), True),
+        StructField("water_mark_driver", TimestampType(), True)])
 
     # struct = StructType().add("driver_id",DataType.simpleString).add("driver_loc", DataType.simpleString).add("water_mark", DataType.simpleString)
 
     # df_driver_with_watermark = df_driver.select(from_json("value", struct_driver).alias("driver"))
 
-    
-    df_driver_with_watermark = df_driver.select(from_json(col("value").cast("string"),schema=struct_driver).alias("driver"))
-    df_driver_with_watermark = df_driver_with_watermark.selectExpr("driver.driver_id","driver.driver_loc","driver.water_mark_driver").withWatermark("water_mark_driver", "2 hours")
+    df_driver_with_watermark = df_driver.select(
+        from_json(col("value").cast("string"), schema=struct_driver).alias("driver"))
+    df_driver_with_watermark = df_driver_with_watermark.selectExpr(
+        "driver.driver_id", "driver.driver_loc", "driver.water_mark_driver").withWatermark("water_mark_driver", "2 hours")
     # df_driver_with_watermark = df_driver_with_watermark.withColumn("water_mark_driver",to_timestamp("water_mark_driver"))
 
     df_driver_with_watermark.printSchema()
@@ -53,9 +54,7 @@ def main():
     #         ).count()
 
     # df_join = df_driver_with_watermark.groupBy("driver_id").count()
-    
-    
-    
+
     # spark.streams.awaitAnyTermination()
 
     # schema = StructType().add("driver_id", StringType()).add("driver_loc", StringType()).add("water_mark", StringType())
@@ -71,40 +70,40 @@ def main():
         .load()
     df_rider.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
 
+    struct_rider = StructType([
+        StructField("ride_req_id", StringType(), True),
+        StructField("pickup_loc", StringType(), True),
+        StructField("dropoff_loc", StringType(), True),
+        StructField("water_mark_rider", TimestampType(), True)])
 
+    df_rider_with_watermark = df_rider.select(
+        from_json(col("value").cast("string"), schema=struct_rider).alias("rider"))
 
-    struct_rider =StructType([
-    StructField("ride_req_id", StringType(), True),
-    StructField("pickup_loc", StringType(), True),
-    StructField("dropoff_loc", StringType(), True),
-    StructField("water_mark_rider", TimestampType(), True)])
-
-    df_rider_with_watermark = df_rider.select(from_json(col("value").cast("string"),schema=struct_rider).alias("rider"))
-
-    df_rider_with_watermark = df_rider_with_watermark.selectExpr("rider.ride_req_id","rider.pickup_loc","rider.dropoff_loc","rider.water_mark_rider").withWatermark("water_mark_rider","10 seconds")
+    df_rider_with_watermark = df_rider_with_watermark.selectExpr(
+        "rider.ride_req_id", "rider.pickup_loc", "rider.dropoff_loc", "rider.water_mark_rider").withWatermark("water_mark_rider", "10 seconds")
     df_rider_with_watermark.printSchema()
-
-    
 
     # op = df_driver_with_watermark.select("driver_id")
 
     # op.writeStream.format("console").option("truncate", "false").start().awaitAnyTermination()
-    
+
     UMatch = df_rider_with_watermark.join(
         df_driver_with_watermark,
         expr("""
-            water_mark_rider = water_mark_driver
-        """),
-        "leftOuter"
+            water_mark_rider = water_mark_driver OR
+            water_mark_rider > water_mark_driver OR
+            water_mark_rider < water_mark_driver
+        """)
     )
-    
-    output = UMatch.writeStream.outputMode("append").format("kafka").option("checkpointLocation", "/tmp/checkpoint").start().awaitAnyTermination()
-    # rider_join = df_rider_with_watermark.withWatermark("water_mark_rider", "20 seconds")
 
+    output = UMatch.writeStream.outputMode("append").format("kafka").option(
+        "checkpointLocation", "/tmp/checkpoint").start()
+    # output.pprint()
+    # rider_join = df_rider_with_watermark.withWatermark("water_mark_rider", "20 seconds")
 
     # op = driver_join.writeStream.outputMode("complete").format("console").start()
     # op.awaitTermination()
-    
+
     # print("raxit")
     # driver_join.isStreaming()
     # df_driver.printSchema()
@@ -112,8 +111,8 @@ def main():
     # joined = rider_window.join(driver_window,
     #                            expr("""
     #                                 water_mark = water_mark
-    #                                 water_mark >= water_mark AND 
-                                    
+    #                                 water_mark >= water_mark AND
+
     #                                 """),
     #                            "leftOuter")
 
