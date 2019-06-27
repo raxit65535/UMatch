@@ -2,17 +2,11 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
 
-spark = SparkSession \
-    .builder \
-    .appName("StructuredNetworkWordCount") \
-    .getOrCreate()
-
-
 def main():
 
     spark = SparkSession \
         .builder \
-        .appName("StructuredNetworkWordCount") \
+        .appName("structed streaming matching") \
         .getOrCreate()
 
     # sparkContext = SparkContext("local[2]", appName='Bipartite-Matching')
@@ -41,10 +35,21 @@ def main():
     df_driver_with_watermark = df_driver.select(
         from_json(col("value").cast("string"), schema=struct_driver).alias("driver"))
     df_driver_with_watermark = df_driver_with_watermark.selectExpr(
-        "driver.driver_id", "driver.driver_loc", "driver.water_mark_driver").withWatermark("water_mark_driver", "2 hours")
+        "driver.driver_id", "driver.driver_loc", "driver.water_mark_driver")
     # df_driver_with_watermark = df_driver_with_watermark.withColumn("water_mark_driver",to_timestamp("water_mark_driver"))
 
-    df_driver_with_watermark.printSchema()
+    wc = df_driver_with_watermark.select(
+                explode(
+                    split(df_driver_with_watermark.filter,";")
+                ).alias("word")
+    )
+
+    wordcount = wc.groupBy('word').count()  
+    # df_driver_with_watermark.printSchema()
+
+    # df_driver_with_watermark = df_driver_with_watermark.select('driver_id')
+
+    # df_driver_with_watermark.writeStream.start()
 
     # df_join = df_driver_with_watermark\
     #     # .withWatermark("water_mark_driver", "20 seconds")\
@@ -62,71 +67,74 @@ def main():
     # col("key").cast("string"),
     # from_json(col("value").cast("string"), schema))
 
-    df_rider = spark \
-        .readStream \
-        .format("kafka") \
-        .option("kafka.bootstrap.servers", "[localhost:9092]") \
-        .option("subscribe", "rider-topic") \
-        .load()
-    df_rider.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
+    # df_rider = spark \
+    #     .readStream \
+    #     .format("kafka") \
+    #     .option("kafka.bootstrap.servers", "[localhost:9092]") \
+    #     .option("subscribe", "rider-topic") \
+    #     .load()
+    # df_rider.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
 
-    struct_rider = StructType([
-        StructField("ride_req_id", StringType(), True),
-        StructField("pickup_loc", StringType(), True),
-        StructField("dropoff_loc", StringType(), True),
-        StructField("water_mark_rider", TimestampType(), True)])
+    # struct_rider = StructType([
+    #     StructField("ride_req_id", StringType(), True),
+    #     StructField("pickup_loc", StringType(), True),
+    #     StructField("dropoff_loc", StringType(), True),
+    #     StructField("water_mark_rider", TimestampType(), True)])
 
-    df_rider_with_watermark = df_rider.select(
-        from_json(col("value").cast("string"), schema=struct_rider).alias("rider"))
+    # df_rider_with_watermark = df_rider.select(
+    #     from_json(col("value").cast("string"), schema=struct_rider).alias("rider"))
 
-    df_rider_with_watermark = df_rider_with_watermark.selectExpr(
-        "rider.ride_req_id", "rider.pickup_loc", "rider.dropoff_loc", "rider.water_mark_rider").withWatermark("water_mark_rider", "10 seconds")
-    df_rider_with_watermark.printSchema()
+    # df_rider_with_watermark = df_rider_with_watermark.selectExpr(
+    #     "rider.ride_req_id", "rider.pickup_loc", "rider.dropoff_loc", "rider.water_mark_rider").withWatermark("water_mark_rider", "10 seconds")
+    # df_rider_with_watermark.show()
 
-    # op = df_driver_with_watermark.select("driver_id")
+    # # op = df_driver_with_watermark.select("driver_id")
 
-    # op.writeStream.format("console").option("truncate", "false").start().awaitAnyTermination()
+    # # op.writeStream.format("console").option("truncate", "false").start().awaitAnyTermination()
 
-    UMatch = df_rider_with_watermark.join(
-        df_driver_with_watermark,
-        expr("""
-            water_mark_rider = water_mark_driver OR
-            water_mark_rider > water_mark_driver OR
-            water_mark_rider < water_mark_driver
-        """)
-    )
+    # # UMatch = df_rider_with_watermark.join(
+    # #     df_driver_with_watermark,
+    # #     expr("""
+    # #         water_mark_rider = water_mark_driver OR
+    # #         water_mark_rider > water_mark_driver OR
+    # #         water_mark_rider < water_mark_driver
+    # #     """)
+    # # )
 
-    output = UMatch.writeStream.outputMode("append").format("kafka").option(
-        "checkpointLocation", "/tmp/checkpoint").start()
+    # output = df_driver_with_watermark.writeStream.outputMode("append").format("kafka").option(
+    #     "checkpointLocation", "/tmp/checkpoint").start()
     # output.pprint()
-    # rider_join = df_rider_with_watermark.withWatermark("water_mark_rider", "20 seconds")
 
-    # op = driver_join.writeStream.outputMode("complete").format("console").start()
-    # op.awaitTermination()
+    df_driver_with_watermark.writeStream.format("console").start()
+    
+    # # rider_join = df_rider_with_watermark.withWatermark("water_mark_rider", "20 seconds")
 
-    # print("raxit")
-    # driver_join.isStreaming()
-    # df_driver.printSchema()
-    # print(df_driver[2])
-    # joined = rider_window.join(driver_window,
-    #                            expr("""
-    #                                 water_mark = water_mark
-    #                                 water_mark >= water_mark AND
+    # # op = driver_join.writeStream.outputMode("complete").format("console").start()
+    # # op.awaitTermination()
 
-    #                                 """),
-    #                            "leftOuter")
+    # # print("raxit")
+    # # driver_join.isStreaming()
+    # # df_driver.printSchema()
+    # # print(df_driver[2])
+    # # joined = rider_window.join(driver_window,
+    # #                            expr("""
+    # #                                 water_mark = water_mark
+    # #                                 water_mark >= water_mark AND
 
-    # joined.isStreaming()
+    # #                                 """),
+    # #                            "leftOuter")
 
-    # value schema: { "a": 1, "b": "string" }
-    # schema = StructType().add("driver_id", StringType()).add("driver_loc", StringType()).add("water_mark", StringType())
-    # df.select(
-    # col("key").cast("string"),
-    # from_json(col("value").cast("string"), schema))
+    # # joined.isStreaming()
 
-    # df.selectExpr("driver_id","driver_loc", "water_mark")
-    # print("raxit this is schema:")
-    # df.printSchema()
+    # # value schema: { "a": 1, "b": "string" }
+    # # schema = StructType().add("driver_id", StringType()).add("driver_loc", StringType()).add("water_mark", StringType())
+    # # df.select(
+    # # col("key").cast("string"),
+    # # from_json(col("value").cast("string"), schema))
+
+    # # df.selectExpr("driver_id","driver_loc", "water_mark")
+    # # print("raxit this is schema:")
+    # # df.printSchema()
 
 
 if __name__ == "__main__":

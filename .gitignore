@@ -1,4 +1,4 @@
 /target/
 .settings/
 .vscode/
-./XDG_CACHE_HOME
+./XDG_CACHE_HOME/

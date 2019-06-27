@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Home</title>
+<link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<style>
+.header {
+  padding: 30px;
+  text-align: center;
+  background: #4285f4;
+  color: white;
+  font-size: 30px;
+}
+</style>
+<script src="/webjars/jquery/jquery.min.js"></script>
+<script src="/webjars/sockjs-client/sockjs.min.js"></script>
+<script src="/webjars/stomp-websocket/stomp.min.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+<script type="text/javascript">
+	var stompClient;
+	
+	/* Chart Configuration */
+	var config = {
+		type : 'line',
+		data : {
+			labels : [],
+			datasets : [ {
+				label : 'Total',
+				backgroudColor : 'rgb(255, 99, 132)',
+				borderColor : 'rgb(255, 99, 132)',
+				data : [],
+				fill : false
+				},
+				{
+				label : 'Matched',
+				backgroudColor : 'rgb(0,0,128)',
+				borderColor : 'rgb(0,0,128)',
+				data : [],
+				fill : false
+
+				}	
+		 	],
+		},
+		options : {
+			responsive : true,
+			title : {
+				display : true,
+				text : 'Match'
+			},
+			tooltips : {
+				mode : 'index',
+				intersect : false
+			},
+			hover : {
+				mode : 'nearest',
+				intersect : true
+			},
+			scales : {
+				xAxes : [ {
+					display : true,
+					type : 'time',
+					time : {
+						displayFormats : {
+							quarter : 'h:mm:ss a'
+						}
+					},
+					scaleLabel : {
+						display : true,
+						labelString : 'Time'
+					}
+				} ],
+				yAxes : [ {
+					display : true,
+					scaleLabel : {
+						display : true,
+						labelString : '#Number'
+					}
+				} ]
+			}
+		}
+	};
+
+
+/* Chart Configuration */
+	var config_driver = {
+		type : 'bar',
+		data : {
+			labels : [],
+			datasets : [ {
+				label : 'Total',
+				backgroudColor : 'rgb(255, 99, 132)',
+				borderColor : 'rgb(255, 99, 132)',
+				data : [],
+				fill : false
+				},
+				{
+				label : 'Matched',
+				backgroudColor : 'rgb(0,0,128)',
+				borderColor : 'rgb(0,0,128)',
+				data : [],
+				fill : false
+
+				}	
+		 	],
+		},
+		options : {
+			responsive : true,
+			title : {
+				display : true,
+				text : 'Match'
+			},
+			tooltips : {
+				mode : 'index',
+				intersect : false
+			},
+			hover : {
+				mode : 'nearest',
+				intersect : true
+			},
+			scales : {
+				xAxes : [ {
+					display : true,
+					type : 'time',
+					time : {
+						displayFormats : {
+							quarter : 'h:mm:ss a'
+						}
+					},
+					scaleLabel : {
+						display : true,
+						labelString : 'Time'
+					}
+				} ],
+				yAxes : [ {
+					display : true,
+					scaleLabel : {
+						display : true,
+						labelString : '#Number'
+					}
+				} ]
+			}
+		}
+	};
+
+
+	/* Document Ready Event */
+	$(document).ready(function() {
+		
+		var ctx = document.getElementById('lineChart').getContext('2d');
+		window.myLine = new Chart(ctx, config);
+
+		var ctx_driver = document.getElementById('barChart').getContext('2d');
+		window.myLine_driver = new Chart(ctx_driver, config_driver);
+		
+		/* Configuring WebSocket on Client Side */
+		var socket = new SockJS('/live-temperature');
+		stompClient = Stomp.over(socket);
+		stompClient.connect({}, function(frame) {
+			stompClient.subscribe('/topic/location_hash', function(Match) {
+				/*$('#temperature').text(temperature.body);*/
+				/* Push new data On X-Axis of Chart */
+				var mtch = Match.body.split(";")
+				config.data.labels.push(mtch[5]);
+				config.data.datasets[0].data.push(mtch[0])
+				config.data.datasets[1].data.push(mtch[1])
+
+				config_driver.data.labels.push(mtch[5]);
+				config_driver.data.datasets[0].data.push(mtch[2])
+				config_driver.data.datasets[1].data.push(mtch[1])
+				/* Push new data on Y-Axis of chart */
+				//config.data.datasets.forEach(function(dataset) {
+				//	dataset.data.push(mtch[0]);
+				//	console.log(mtch[1])
+				//	dataset.data.push(mtch[1])
+				//});
+				
+				
+				window.myLine.update();
+				window.myLine_driver.update();
+			});
+		});
+	});
+</script>
+</head>
+<body>
+
+	<div class="header">
+  		<h1>UMatch</h1>
+  		<p style='font-size: 15px'>A greedy matching solution in streaming window.</p>
+	</div>
+	
+	<div class="model">
+		<div class="modal-dialog" style="width:80%;height:auto">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Match Statestics</h5>
+				</div>
+				<div class="model-body">
+					<div class="container" style="width:80%">
+						<canvas id="lineChart"></canvas>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="model">
+		<div class="modal-dialog" style="width:80%;height:auto">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Match Statestics</h5>
+				</div>
+				<div class="model-body">
+					<div class="container" style="width:80%">
+						<canvas id="barChart"></canvas>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	
+</body>
+</html>
