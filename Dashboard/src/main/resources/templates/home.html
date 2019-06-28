@@ -87,7 +87,7 @@
 
 /* Chart Configuration */
 	var config_driver = {
-		type : 'bar',
+		type : 'line',
 		data : {
 			labels : [],
 			datasets : [ {
@@ -111,7 +111,7 @@
 			responsive : true,
 			title : {
 				display : true,
-				text : 'Match'
+				text : 'Match - Drivers'
 			},
 			tooltips : {
 				mode : 'index',
@@ -153,7 +153,7 @@
 		var ctx = document.getElementById('lineChart').getContext('2d');
 		window.myLine = new Chart(ctx, config);
 
-		var ctx_driver = document.getElementById('barChart').getContext('2d');
+		var ctx_driver = document.getElementById('lineChart_driver').getContext('2d');
 		window.myLine_driver = new Chart(ctx_driver, config_driver);
 		
 		/* Configuring WebSocket on Client Side */
@@ -164,11 +164,11 @@
 				/*$('#temperature').text(temperature.body);*/
 				/* Push new data On X-Axis of Chart */
 				var mtch = Match.body.split(";")
-				config.data.labels.push(mtch[5]);
+				config.data.labels.push(mtch[3]);
 				config.data.datasets[0].data.push(mtch[0])
 				config.data.datasets[1].data.push(mtch[1])
 
-				config_driver.data.labels.push(mtch[5]);
+				config_driver.data.labels.push(mtch[3]);
 				config_driver.data.datasets[0].data.push(mtch[2])
 				config_driver.data.datasets[1].data.push(mtch[1])
 				/* Push new data on Y-Axis of chart */
@@ -200,29 +200,32 @@
 					<h5 class="modal-title">Match Statestics</h5>
 				</div>
 				<div class="model-body">
-					<div class="container" style="width:80%">
+					<div class="container" style="width:70%">
 						<canvas id="lineChart"></canvas>
+					</div>
+					<div class="container" style="width:70%">
+						<canvas id="lineChart_driver"></canvas>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<div class="model">
+	<!--<div class="model">
 		<div class="modal-dialog" style="width:80%;height:auto">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title">Match Statestics</h5>
+					<h5 class="modal-title">Match Statestics - Driver</h5>
 				</div>
 				<div class="model-body">
 					<div class="container" style="width:80%">
-						<canvas id="barChart"></canvas>
+						<canvas id="lineChart_driver"></canvas>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-
+-->
 
 	
 </body>
