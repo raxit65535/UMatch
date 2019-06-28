@@ -20,7 +20,9 @@ def main():
     s3 = boto3.resource('s3')
     bucket = s3.Bucket('nyc-tlc')
 
-    producer = KafkaProducer(bootstrap_servers="localhost:9092")
+    # producer = KafkaProducer(bootstrap_servers="localhost:9092")
+    producer = KafkaProducer(
+        bootstrap_servers="10.0.0.4:9092, 10.0.0.5:9092, 10.0.0.10:9092")
 
     for obj in bucket.objects.filter(Prefix="trip data"):
         key = obj.key
@@ -55,7 +57,8 @@ def main():
                 driver_id_verbose = 'driver:' + \
                     str(datetime.now()) + ":" + str(random.randint(1, 1000))
                 driver_id = re.sub('[\W\_]', '', driver_id_verbose)
-                formatted_message = format_message(driver_id, driver_loc, str(datetime.now()))
+                formatted_message = format_message(
+                    driver_id, driver_loc, str(datetime.now()))
 
                 print(formatted_message)
                 producer.send('driver_topic',

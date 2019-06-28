@@ -9,22 +9,22 @@ from math import radians, cos, sin, asin, sqrt
 import pygeohash as gh
 
 
-'''
-Precision of Geo Hash
-#   km      
-1   ± 2500
-2   ± 630
-3   ± 78
-4   ± 20
-5   ± 2.4
-6   ± 0.61
-7   ± 0.076
-8   ± 0.019
-9   ± 0.0024
-10  ± 0.00060
-11  ± 0.000074
 
-'''
+# Precision of Geo Hash
+# #   km      
+# 1   ± 2500
+# 2   ± 630
+# 3   ± 78
+# 4   ± 20
+# 5   ± 2.4
+# 6   ± 0.61
+# 7   ± 0.076
+# 8   ± 0.019
+# 9   ± 0.0024
+# 10  ± 0.00060
+# 11  ± 0.000074
+
+
 # Function to generate geo location hash based on longitude and lattitude. Precision is 5 decimal points
 def geohash(x):
 
@@ -37,8 +37,8 @@ def geohash(x):
 
 # function to Sink the computation statestics to Kafka
 def kafkaSink(matched_stats):
-    producer = KafkaProducer(bootstrap_servers="localhost:9092")
-    # producer = KafkaProducer(bootstrap_servers = "10.0.0.4:9092, 10.0.0.5:9092, 10.0.0.10:9092")
+    # producer = KafkaProducer(bootstrap_servers="localhost:9092")
+    producer = KafkaProducer(bootstrap_servers = "10.0.0.4:9092, 10.0.0.5:9092, 10.0.0.10:9092")
     producer.send('hash_matched_stats', matched_stats.encode('utf8'))
     producer.flush()
 
@@ -195,13 +195,13 @@ def main():
 
     # create DStream that reads the Driver Stream
     spark_kafka_driver_Stream = KafkaUtils.createDirectStream(sparkStreamingContext, ['driver_topic'],
-                                                              # {'metadata.broker.list': '10.0.0.4:9092, 10.0.0.5:9092, 10.0.0.10:9092'})
-                                                              {'metadata.broker.list': 'localhost:9092'})
+                                                              {'metadata.broker.list': '10.0.0.4:9092, 10.0.0.5:9092, 10.0.0.10:9092'})
+                                                            #   {'metadata.broker.list': 'localhost:9092'})
     
     #creating DStream that reads the Rider stream
     spark_kafka_rider_stream = KafkaUtils.createDirectStream(sparkStreamingContext, ['rider_topic'],
-                                                             #  {'metadata.broker.list': '10.0.0.4:9092, 10.0.0.5:9092, 10.0.0.10:9092'})
-                                                             {'metadata.broker.list': 'localhost:9092'})
+                                                              {'metadata.broker.list': '10.0.0.4:9092, 10.0.0.5:9092, 10.0.0.10:9092'})
+                                                            #  {'metadata.broker.list': 'localhost:9092'})
 
     
     # defining the Window size
