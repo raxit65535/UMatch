@@ -135,8 +135,11 @@ def process_union(rdd):
         if driver[0] not in total_driver:
             total_driver[driver[0]] = "new"
 
+        # if the driver id and rider id is not in the matched dictionary
         if rider[0] not in matched_list and driver[0] not in matched_driver:
             # print("not yet matched")
+
+            # then compute the distance between
             distance = haversine(ride_long, ride_lat, driver_long, driver_lat)
             if distance < 3:
                 # print("herversine true, adding the value")

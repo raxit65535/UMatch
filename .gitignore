@@ -1,4 +1,6 @@
 /target/
 .settings/
 .vscode/
+.classpath
 ./XDG_CACHE_HOME/
+.project
