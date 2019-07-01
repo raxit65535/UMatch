@@ -161,9 +161,11 @@
 		stompClient = Stomp.over(socket);
 		stompClient.connect({}, function(frame) {
 			stompClient.subscribe('/topic/location_hash', function(Match) {
-				/*$('#temperature').text(temperature.body);*/
+				
 				/* Push new data On X-Axis of Chart */
 				var mtch = Match.body.split(";")
+				var date_computed = mtch[3].split(" ")
+				date_computed = date_computed[1]
 				config.data.labels.push(mtch[3]);
 				config.data.datasets[0].data.push(mtch[0])
 				config.data.datasets[1].data.push(mtch[1])
@@ -171,12 +173,7 @@
 				config_driver.data.labels.push(mtch[3]);
 				config_driver.data.datasets[0].data.push(mtch[2])
 				config_driver.data.datasets[1].data.push(mtch[1])
-				/* Push new data on Y-Axis of chart */
-				//config.data.datasets.forEach(function(dataset) {
-				//	dataset.data.push(mtch[0]);
-				//	console.log(mtch[1])
-				//	dataset.data.push(mtch[1])
-				//});
+				
 				
 				
 				window.myLine.update();
