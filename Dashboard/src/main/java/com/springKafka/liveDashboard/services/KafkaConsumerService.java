@@ -5,6 +5,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.kafka.annotation.PartitionOffset;
 
 @Service
 public class KafkaConsumerService{

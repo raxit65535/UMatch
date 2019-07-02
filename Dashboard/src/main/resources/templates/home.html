@@ -164,8 +164,7 @@
 				
 				/* Push new data On X-Axis of Chart */
 				var mtch = Match.body.split(";")
-				var date_computed = mtch[3].split(" ")
-				date_computed = date_computed[1]
+				
 				config.data.labels.push(mtch[3]);
 				config.data.datasets[0].data.push(mtch[0])
 				config.data.datasets[1].data.push(mtch[1])
