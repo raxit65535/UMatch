@@ -34,8 +34,8 @@ def geohash(x):
 
 # function to Sink the computation statestics to Kafka
 def kafkaSink(matched_stats, sink_driver):
-    producer = KafkaProducer(bootstrap_servers="localhost:9092")
-    # producer = KafkaProducer(bootstrap_servers = "10.0.0.4:9092, 10.0.0.5:9092, 10.0.0.10:9092")
+    # producer = KafkaProducer(bootstrap_servers="localhost:9092")
+    producer = KafkaProducer(bootstrap_servers = "10.0.0.4:9092, 10.0.0.5:9092, 10.0.0.10:9092")
     # print(matched_stats)
     producer.send('hash_matched_stats', matched_stats.encode('utf8'))
 
@@ -157,17 +157,17 @@ def main():
 
     # create DStream that reads the Driver Stream
     spark_kafka_driver_Stream = KafkaUtils.createDirectStream(sparkStreamingContext, ['driver_topic'],
-                                                              #   {'metadata.broker.list': '10.0.0.4:9092, 10.0.0.5:9092, 10.0.0.10:9092'})
-                                                              {'metadata.broker.list': 'localhost:9092'})
+                                                                {'metadata.broker.list': '10.0.0.4:9092, 10.0.0.5:9092, 10.0.0.10:9092'})
+                                                            #   {'metadata.broker.list': 'localhost:9092'})
 
     # creating DStream that reads the Rider stream
     spark_kafka_rider_stream = KafkaUtils.createDirectStream(sparkStreamingContext, ['rider_topic'],
-                                                             #   {'metadata.broker.list': '10.0.0.4:9092, 10.0.0.5:9092, 10.0.0.10:9092'})
-                                                             {'metadata.broker.list': 'localhost:9092'})
+                                                               {'metadata.broker.list': '10.0.0.4:9092, 10.0.0.5:9092, 10.0.0.10:9092'})
+                                                            #  {'metadata.broker.list': 'localhost:9092'})
 
     # defining the Window size
-    driver_window = spark_kafka_driver_Stream.window(1)
-    rider_window = spark_kafka_rider_stream.window(1)
+    driver_window = spark_kafka_driver_Stream.window(3)
+    rider_window = spark_kafka_rider_stream.window(3)
 
     # creating location hash - precision 0.5 on driver RDD.
     driver_window = driver_window.map(lambda x: x[1])\

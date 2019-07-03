@@ -13,6 +13,7 @@
   font-size: 30px;
 }
 </style>
+
 <script src="/webjars/jquery/jquery.min.js"></script>
 <script src="/webjars/sockjs-client/sockjs.min.js"></script>
 <script src="/webjars/stomp-websocket/stomp.min.js"></script>
@@ -186,7 +187,7 @@
 
 	<div class="header">
   		<h1>UMatch</h1>
-  		<p style='font-size: 15px'>A greedy matching solution in streaming window.</p>
+  		<p style='font-size: 15px'>A greedy matching solution in Real Time.</p>
 	</div>
 	
 	<div class="model">
@@ -196,10 +197,22 @@
 					<h5 class="modal-title">Match Statestics</h5>
 				</div>
 				<div class="model-body">
-					<div class="container" style="width:70%">
+					<div class="container">
 						<canvas id="lineChart"></canvas>
 					</div>
-					<div class="container" style="width:70%">
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="model">
+		<div class="modal-dialog" style="width:80%;height:auto">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Match Statestics - Driver</h5>
+				</div>
+				<div class="model-body">
+					<div class="container">
 						<canvas id="lineChart_driver"></canvas>
 					</div>
 				</div>
@@ -207,21 +220,6 @@
 		</div>
 	</div>
 
-	<!--<div class="model">
-		<div class="modal-dialog" style="width:80%;height:auto">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">Match Statestics - Driver</h5>
-				</div>
-				<div class="model-body">
-					<div class="container" style="width:80%">
-						<canvas id="lineChart_driver"></canvas>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
--->
 
 	
 </body>
