@@ -73,7 +73,7 @@ The yellow and green taxi trip records include fields capturing pick-up and drop
 * Then I came across an [article], which described how to build the greedy bipartite matching using left outer join.
 
 ## Performance
-- Yet to come
+<img align="left" src="information/Performance.png">
 
 [slides]: https://docs.google.com/presentation/d/1nU3rWpFfQganNrtOrHuxNptB9rt6fwZElzJAdsZ7r_4/edit?usp=sharing
 [Kafka-Graphs]: https://github.com/rayokota/kafka-graphs.git
